@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Doppler Effect Simulator</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>🚀 Doppler Effect Simulator</h1>
+
+<p>물리학Ⅱ | 상대론적 도플러 효과 탐구</p>
+
+</header>
+
+<nav>
+
+<button onclick="showPage('home')">🏠 홈</button>
+
+<button onclick="showPage('theory')">📚 이론</button>
+
+<button onclick="showPage('sim')">🧮 시뮬레이터</button>
+
+<button onclick="showPage('math')">📈 수학 모델</button>
+
+</nav>
+
+<div class="page" id="home">
+
+<h2>도플러 효과란?</h2>
+
+<p>
+
+도플러 효과는
+
+관측자와 파원의 상대운동 때문에
+
+관측되는 진동수와 파장이 변하는 현상이다.
+
+</p>
+
+<img
+src="https://upload.wikimedia.org/wikipedia/commons/0/09/Doppler_effect.gif"
+width="350">
+
+</div>
+
+<div class="page" id="theory">
+
+<h2>물리학Ⅱ 이론</h2>
+
+<h3>고전적 도플러 효과</h3>
+
+<p>
+
+f'/f = 1 − β
+
+</p>
+
+<h3>상대론적 도플러 효과</h3>
+
+<p>
+
+f'/f = √((1−β)/(1+β))
+
+</p>
+
+<p>
+
+β = v/c
+
+</p>
+
+</div>
+
+<div class="page" id="sim">
+
+<h2>속도 입력</h2>
+
+<input
+type="range"
+min="0"
+max="0.99"
+step="0.01"
+value="0.2"
+id="speed">
+
+<h3>
+
+속도 :
+
+<span id="speedValue">
+
+0.20
+
+</span>
+
+c
+
+</h3>
+
+<div class="card">
+
+<p>
+
+고전식
+
+</p>
+
+<h2 id="classic"></h2>
+
+</div>
+
+<div class="card">
+
+<p>
+
+상대론
+
+</p>
+
+<h2 id="relativity"></h2>
+
+</div>
+
+<div class="card">
+
+<p>
+
+오차
+
+</p>
+
+<h2 id="error"></h2>
+
+</div>
+
+<div id="light"></div>
+<h2>🌈 빛의 스펙트럼 변화</h2>
+
+<div id="spectrum">
+
+<div class="color violet"></div>
+
+<div class="color blue"></div>
+
+<div class="color cyan"></div>
+
+<div class="color green"></div>
+
+<div class="color yellow"></div>
+
+<div class="color orange"></div>
+
+<div class="color red"></div>
+
+</div>
+
+<p id="shiftText">
+
+현재 : 청색편이
+
+</p>
+
+
+<canvas id="graph"></canvas>
+
+</div>
+
+<div class="page" id="math">
+
+<h2>수학적 모델링</h2>
+
+<p>
+
+속도 β를 변수로 하는 함수로
+
+고전식과 상대론식을 비교하였다.
+
+</p>
+
+<p>
+
+속도가 작을 때는
+
+두 함수가 거의 일치하지만,
+
+광속에 가까워질수록
+
+차이가 커진다.
+
+</p>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
+body{
+
+margin:0;
+
+background:linear-gradient(#020111,#081b33);
+
+color:white;
+
+font-family:Arial;
+
+text-align:center;
+
+}
+
+header{
+
+padding:30px;
+
+}
+
+nav{
+
+background:#111;
+
+padding:10px;
+
+}
+
+button{
+
+padding:12px;
+
+margin:5px;
+
+border:none;
+
+border-radius:8px;
+
+background:#0099ff;
+
+color:white;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+background:#00c3ff;
+
+}
+
+.page{
+
+display:none;
+
+padding:30px;
+
+}
+
+#home{
+
+display:block;
+
+}
+
+.card{
+
+display:inline-block;
+
+background:white;
+
+color:black;
+
+padding:20px;
+
+margin:10px;
+
+border-radius:15px;
+
+width:180px;
+
+}
+
+canvas{
+
+background:white;
+
+margin-top:30px;
+
+max-width:800px;
+
+}
+
+#light{
+
+width:120px;
+
+height:120px;
+
+border-radius:60px;
+
+margin:30px auto;
+
+background:red;
+
+box-shadow:0 0 50px red;
+
+transition:1s;
+
+}
+// ===========================
+// 페이지 이동
+// ===========================
+
+function showPage(pageId) {
+
+    let pages = document.getElementsByClassName("page");
+
+    for (let i = 0; i < pages.length; i++) {
+        pages[i].style.display = "none";
+    }
+
+    document.getElementById(pageId).style.display = "block";
+
+}
+
+
+
+// ===========================
+// HTML 요소 가져오기
+// ===========================
+
+const slider = document.getElementById("speed");
+
+const speedValue = document.getElementById("speedValue");
+
+const classicText = document.getElementById("classic");
+
+const relativityText = document.getElementById("relativity");
+
+const errorText = document.getElementById("error");
+
+const light = document.getElementById("light");
+
+
+
+// ===========================
+// 공식
+// ===========================
+
+function classical(beta){
+
+    return 1-beta;
+
+}
+
+function relativistic(beta){
+
+    return Math.sqrt((1-beta)/(1+beta));
+
+}
+
+
+
+// ===========================
+// 그래프 만들기
+// ===========================
+
+const ctx=document.getElementById("graph").getContext("2d");
+
+const graph=new Chart(ctx,{
+
+type:"line",
+
+data:{
+
+labels:[],
+
+datasets:[
+
+{
+
+label:"고전식",
+
+data:[],
+
+borderColor:"red",
+
+fill:false
+
+},
+
+{
+
+label:"상대론",
+
+data:[],
+
+borderColor:"blue",
+
+fill:false
+
+}
+
+]
+
+},
+
+options:{
+
+responsive:true,
+
+animation:false,
+
+plugins:{
+
+legend:{
+
+display:true
+
+}
+
+},
+
+scales:{
+
+x:{
+
+title:{
+
+display:true,
+
+text:"속도 (v/c)"
+
+}
+
+},
+
+y:{
+
+title:{
+
+display:true,
+
+text:"f'/f"
+
+},
+
+min:0,
+
+max:1
+
+}
+
+}
+
+}
+
+});
+
+
+
+// ===========================
+// 그래프 데이터
+// ===========================
+
+function drawGraph(){
+
+graph.data.labels=[];
+
+graph.data.datasets[0].data=[];
+
+graph.data.datasets[1].data=[];
+
+for(let b=0;b<=0.99;b+=0.01){
+
+graph.data.labels.push(b.toFixed(2));
+
+graph.data.datasets[0].data.push(classical(b));
+
+graph.data.datasets[1].data.push(relativistic(b));
+
+}
+
+graph.update();
+
+}
+
+drawGraph();
+
+
+
+// ===========================
+// 적색편이 색 변화
+// ===========================
+
+function updateColor(beta){
+
+if(beta<0.2){
+
+light.style.background="#66ccff";
+
+light.style.boxShadow="0 0 50px #66ccff";
+
+}
+
+else if(beta<0.4){
+
+light.style.background="#00ff88";
+
+light.style.boxShadow="0 0 50px #00ff88";
+
+}
+
+else if(beta<0.6){
+
+light.style.background="yellow";
+
+light.style.boxShadow="0 0 60px yellow";
+
+}
+
+else if(beta<0.8){
+
+light.style.background="orange";
+
+light.style.boxShadow="0 0 70px orange";
+
+}
+
+else{
+
+light.style.background="red";
+
+light.style.boxShadow="0 0 90px red";
+
+}
+
+}
+
+
+
+// ===========================
+// 계산
+// ===========================
+
+function update(){
+
+let beta=parseFloat(slider.value);
+
+speedValue.innerHTML=beta.toFixed(2);
+
+let c=classical(beta);
+
+let r=relativistic(beta);
+
+let error=Math.abs(c-r)/r*100;
+
+classicText.innerHTML=c.toFixed(4);
+
+relativityText.innerHTML=r.toFixed(4);
+
+errorText.innerHTML=error.toFixed(2)+" %";
+
+function updateColor(beta){
+
+const spectrum=document.getElementById("spectrum");
+
+const text=document.getElementById("shiftText");
+
+if(beta<0.15){
+
+light.style.background="#5ecbff";
+
+light.style.boxShadow="0 0 60px #5ecbff";
+
+spectrum.style.transform="translateX(-120px)";
+
+text.innerHTML="🔵 청색편이";
+
+}
+
+else if(beta<0.35){
+
+light.style.background="#00ff99";
+
+light.style.boxShadow="0 0 60px #00ff99";
+
+spectrum.style.transform="translateX(-60px)";
+
+text.innerHTML="🟢 거의 변화 없음";
+
+}
+
+else if(beta<0.60){
+
+light.style.background="yellow";
+
+light.style.boxShadow="0 0 70px yellow";
+
+spectrum.style.transform="translateX(0px)";
+
+text.innerHTML="🟡 약한 적색편이";
+
+}
+
+else if(beta<0.80){
+
+light.style.background="orange";
+
+light.style.boxShadow="0 0 80px orange";
+
+spectrum.style.transform="translateX(60px)";
+
+text.innerHTML="🟠 적색편이";
+
+}
+
+else{
+
+light.style.background="red";
+
+light.style.boxShadow="0 0 100px red";
+
+spectrum.style.transform="translateX(120px)";
+
+text.innerHTML="🔴 강한 적색편이";
+
+}
+
+}
+
+
+
+// ===========================
+// 슬라이더
+// ===========================
+
+slider.addEventListener("input",update);
+
+update();
+#spectrum{
+
+display:flex;
+
+width:90%;
+
+height:60px;
+
+margin:auto;
+
+margin-top:20px;
+
+border-radius:10px;
+
+overflow:hidden;
+
+box-shadow:0 0 20px white;
+
+}
+
+.color{
+
+flex:1;
+
+transition:0.8s;
+
+}
+
+.violet{
+
+background:#6a00ff;
+
+}
+
+.blue{
+
+background:#004cff;
+
+}
+
+.cyan{
+
+background:#00d9ff;
+
+}
+
+.green{
+
+background:#00d000;
+
+}
+
+.yellow{
+
+background:#ffe600;
+
+}
+
+.orange{
+
+background:orange;
+
+}
+
+.red{
+
+background:red;
+
+}
+
+#shiftText{
+
+font-size:22px;
+
+font-weight:bold;
+
+margin-top:20px;
+
+}
